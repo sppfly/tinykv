@@ -28,7 +28,7 @@ type Decoder struct {
 func NewDecoder(requestColIDs []int64, handleColID int64, tps []*types.FieldType, origDefaults [][]byte,
 	loc *time.Location) (*Decoder, error) {
 	xOrigDefaultVals := make([][]byte, len(origDefaults))
-	for i := 0; i < len(origDefaults); i++ {
+	for i := range origDefaults {
 		if len(origDefaults[i]) == 0 {
 			continue
 		}

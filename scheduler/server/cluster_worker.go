@@ -58,7 +58,7 @@ func (c *RaftCluster) handleAskSplit(request *schedulerpb.AskSplitRequest) (*sch
 	}
 
 	peerIDs := make([]uint64, len(request.Region.Peers))
-	for i := 0; i < len(peerIDs); i++ {
+	for i := range peerIDs {
 		if peerIDs[i], err = c.s.idAllocator.Alloc(); err != nil {
 			return nil, err
 		}

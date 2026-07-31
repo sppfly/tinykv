@@ -141,7 +141,7 @@ func (c *coordinator) run() {
 		configs       []string
 		err           error
 	)
-	for i := 0; i < maxLoadConfigRetries; i++ {
+	for i := range maxLoadConfigRetries {
 		scheduleNames, configs, err = c.cluster.storage.LoadAllScheduleConfig()
 		if err == nil {
 			break
@@ -345,7 +345,7 @@ func (s *scheduleController) Stop() {
 }
 
 func (s *scheduleController) Schedule() *operator.Operator {
-	for i := 0; i < maxScheduleRetries; i++ {
+	for range maxScheduleRetries {
 		// If we have schedule, reset interval to the minimal interval.
 		if op := s.Scheduler.Schedule(s.cluster); op != nil {
 			s.nextInterval = s.Scheduler.GetMinInterval()

@@ -67,10 +67,7 @@ const EmptyRegionApproximateSize = 1
 func RegionFromHeartbeat(heartbeat *schedulerpb.RegionHeartbeatRequest) *RegionInfo {
 	// Convert unit to MB.
 	// If region is empty or less than 1MB, use 1MB instead.
-	regionSize := heartbeat.GetApproximateSize() / (1 << 20)
-	if regionSize < EmptyRegionApproximateSize {
-		regionSize = EmptyRegionApproximateSize
-	}
+	regionSize := max(heartbeat.GetApproximateSize()/(1<<20), EmptyRegionApproximateSize)
 
 	region := &RegionInfo{
 		meta:            heartbeat.GetRegion(),
@@ -703,7 +700,7 @@ type RegionsContainer interface {
 }
 
 func randRegion(regions RegionsContainer, opts ...RegionOption) *RegionInfo {
-	for i := 0; i < randomRegionMaxRetry; i++ {
+	for range randomRegionMaxRetry {
 		region := regions.RandomRegion(nil, nil)
 		if region == nil {
 			return nil

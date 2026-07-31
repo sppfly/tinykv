@@ -136,7 +136,7 @@ func (encoder *Encoder) build(buf []byte) ([]byte, error) {
 		if len(r.data) > math.MaxUint16 && !r.large {
 			// We need to convert the row to large row.
 			encoder.initColIDs32()
-			for j := 0; j < numCols; j++ {
+			for j := range numCols {
 				r.colIDs32[j] = uint32(r.colIDs[j])
 			}
 			encoder.initOffsets32()

@@ -2,7 +2,8 @@ package engine_util
 
 import (
 	"bytes"
-	"io/ioutil"
+	"os"
+
 	"testing"
 
 	"github.com/Connor1996/badger"
@@ -10,7 +11,7 @@ import (
 )
 
 func TestEngineUtil(t *testing.T) {
-	dir, err := ioutil.TempDir("", "engine_util")
+	dir, err := os.MkdirTemp("", "engine_util")
 	opts := badger.DefaultOptions
 	opts.Dir = dir
 	opts.ValueDir = dir

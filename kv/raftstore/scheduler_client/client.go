@@ -110,7 +110,7 @@ func NewClient(pdAddrs []string, tag string) (Client, error) {
 		err     error
 		members *schedulerpb.GetMembersResponse
 	)
-	for i := 0; i < maxRetryCount; i++ {
+	for range maxRetryCount {
 		if members, err = c.updateLeader(); err == nil {
 			break
 		}
@@ -254,7 +254,7 @@ func (c *client) leaderClient() schedulerpb.SchedulerClient {
 
 func (c *client) doRequest(ctx context.Context, f func(context.Context, schedulerpb.SchedulerClient) error) error {
 	var err error
-	for i := 0; i < maxRetryCount; i++ {
+	for range maxRetryCount {
 		ctx1, cancel := context.WithTimeout(ctx, schedulerTimeout)
 		err = f(ctx1, c.leaderClient())
 		cancel()

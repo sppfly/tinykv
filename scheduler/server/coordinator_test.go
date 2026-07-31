@@ -60,8 +60,8 @@ func newTestCluster(opt *config.ScheduleOption) *testCluster {
 func newTestRegionMeta(regionID uint64) *metapb.Region {
 	return &metapb.Region{
 		Id:          regionID,
-		StartKey:    []byte(fmt.Sprintf("%20d", regionID)),
-		EndKey:      []byte(fmt.Sprintf("%20d", regionID+1)),
+		StartKey:    fmt.Appendf(nil, "%20d", regionID),
+		EndKey:      fmt.Appendf(nil, "%20d", regionID+1),
 		RegionEpoch: &metapb.RegionEpoch{Version: 1, ConfVer: 1},
 	}
 }
@@ -430,7 +430,7 @@ func (s *testCoordinatorSuite) TestShouldRunWithNonLeaderRegions(c *C) {
 	c.Assert(tc.addLeaderStore(1, 10), IsNil)
 	c.Assert(tc.addLeaderStore(2, 0), IsNil)
 	c.Assert(tc.addLeaderStore(3, 0), IsNil)
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		c.Assert(tc.LoadRegion(uint64(i+1), 1, 2, 3), IsNil)
 	}
 	c.Assert(co.shouldRun(), IsFalse)

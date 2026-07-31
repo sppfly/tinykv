@@ -54,7 +54,7 @@ type testRegionUnhealthySuite struct{}
 
 func (s *testRegionUnhealthySuite) TestIsRegionUnhealthy(c *C) {
 	peers := make([]*metapb.Peer, 0, 3)
-	for i := uint64(0); i < 2; i++ {
+	for i := range uint64(2) {
 		p := &metapb.Peer{
 			Id:      i,
 			StoreId: i,

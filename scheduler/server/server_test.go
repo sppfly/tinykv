@@ -66,7 +66,7 @@ func (s *testLeaderServerSuite) SetUpSuite(c *C) {
 	cfgs := NewTestMultiConfig(c, 3)
 
 	ch := make(chan *Server, 3)
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		cfg := cfgs[i]
 
 		go func() {
@@ -78,7 +78,7 @@ func (s *testLeaderServerSuite) SetUpSuite(c *C) {
 		}()
 	}
 
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		svr := <-ch
 		s.svrs[svr.GetAddr()] = svr
 		s.leaderPath = svr.GetMember().GetLeaderPath()
@@ -111,7 +111,7 @@ func newTestServersWithCfgs(ctx context.Context, c *C, cfgs []*config.Config) ([
 		}(cfg)
 	}
 
-	for i := 0; i < len(cfgs); i++ {
+	for range cfgs {
 		svrs = append(svrs, <-ch)
 	}
 	mustWaitLeader(c, svrs)

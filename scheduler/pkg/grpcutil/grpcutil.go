@@ -16,7 +16,8 @@ package grpcutil
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
+	"os"
+
 	"net/url"
 
 	"github.com/pkg/errors"
@@ -40,7 +41,7 @@ func GetClientConn(addr string, caPath string, certPath string, keyPath string) 
 
 		// Create a certificate pool from the certificate authority
 		certPool := x509.NewCertPool()
-		ca, err := ioutil.ReadFile(caPath)
+		ca, err := os.ReadFile(caPath)
 		if err != nil {
 			return nil, errors.Errorf("could not read ca certificate: %s", err)
 		}

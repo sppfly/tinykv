@@ -73,17 +73,15 @@ func (s *testTsoSuite) testGetTimestamp(c *C, n int) *schedulerpb.Timestamp {
 
 func (s *testTsoSuite) TestTso(c *C) {
 	var wg sync.WaitGroup
-	for i := 0; i < 10; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+	for range 10 {
+		wg.Go(func() {
 
 			last := &schedulerpb.Timestamp{
 				Physical: 0,
 				Logical:  0,
 			}
 
-			for j := 0; j < 30; j++ {
+			for range 30 {
 				ts := s.testGetTimestamp(c, 10)
 				c.Assert(ts.GetPhysical(), Not(Less), last.GetPhysical())
 				if ts.GetPhysical() == last.GetPhysical() {
@@ -92,7 +90,7 @@ func (s *testTsoSuite) TestTso(c *C) {
 				last = ts
 				time.Sleep(10 * time.Millisecond)
 			}
-		}()
+		})
 	}
 
 	wg.Wait()

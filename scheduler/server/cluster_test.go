@@ -338,13 +338,13 @@ func (s *testClusterInfoSuite) TestRegionSplitAndMerge3C(c *C) {
 	n := 7
 
 	// Split.
-	for i := 0; i < n; i++ {
+	for range n {
 		regions = core.SplitRegions(regions)
 		heartbeatRegions(c, cluster, regions)
 	}
 
 	// Merge.
-	for i := 0; i < n; i++ {
+	for range n {
 		regions = core.MergeRegions(regions)
 		heartbeatRegions(c, cluster, regions)
 	}
@@ -437,11 +437,11 @@ func (s *testClusterSuite) TestConcurrentHandleRegion3C(c *C) {
 		}(i == 0)
 	}
 	concurrent := 2000
-	for i := 0; i < concurrent; i++ {
+	for i := range concurrent {
 		region := &metapb.Region{
 			Id:       s.allocID(c),
-			StartKey: []byte(fmt.Sprintf("%5d", i)),
-			EndKey:   []byte(fmt.Sprintf("%5d", i+1)),
+			StartKey: fmt.Appendf(nil, "%5d", i),
+			EndKey:   fmt.Appendf(nil, "%5d", i+1),
 			Peers:    []*metapb.Peer{{Id: s.allocID(c), StoreId: stores[0].GetId()}},
 			RegionEpoch: &metapb.RegionEpoch{
 				ConfVer: initEpochConfVer,
@@ -454,12 +454,10 @@ func (s *testClusterSuite) TestConcurrentHandleRegion3C(c *C) {
 			region.EndKey = []byte("")
 		}
 
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			err := s.svr.cluster.HandleRegionHeartbeat(core.NewRegionInfo(region, region.Peers[0]))
 			c.Assert(err, IsNil)
-		}()
+		})
 	}
 	wg.Wait()
 }
@@ -969,9 +967,9 @@ type testRegionsInfoSuite struct{}
 // Each region contains np peers, the first peer is the leader.
 func newTestRegions(n, np uint64) []*core.RegionInfo {
 	regions := make([]*core.RegionInfo, 0, n)
-	for i := uint64(0); i < n; i++ {
+	for i := range n {
 		peers := make([]*metapb.Peer, 0, np)
-		for j := uint64(0); j < np; j++ {
+		for j := range np {
 			peer := &metapb.Peer{
 				Id: i*np + j,
 			}
@@ -995,7 +993,7 @@ func (s *testRegionsInfoSuite) Test(c *C) {
 	cache := core.NewRegionsInfo()
 	regions := newTestRegions(n, np)
 
-	for i := uint64(0); i < n; i++ {
+	for i := range n {
 		region := regions[i]
 		regionKey := []byte{byte(i)}
 
@@ -1035,7 +1033,7 @@ func (s *testRegionsInfoSuite) Test(c *C) {
 		checkRegion(c, cache.SearchRegion(regionKey), newRegion)
 	}
 
-	for i := uint64(0); i < n; i++ {
+	for i := range n {
 		region := cache.RandLeaderRegion(i, core.HealthRegion())
 		c.Assert(region.GetLeader().GetStoreId(), Equals, i)
 
@@ -1053,7 +1051,7 @@ func (s *testRegionsInfoSuite) Test(c *C) {
 	c.Assert(cache.GetRegion(n-1), NotNil)
 
 	// All regions will be filtered out if they have pending peers.
-	for i := uint64(0); i < n; i++ {
+	for i := range n {
 		for j := 0; j < cache.GetStoreLeaderCount(i); j++ {
 			region := cache.RandLeaderRegion(i, core.HealthRegion())
 			newRegion := region.Clone(core.WithPendingPeers(region.GetPeers()))
@@ -1061,7 +1059,7 @@ func (s *testRegionsInfoSuite) Test(c *C) {
 		}
 		c.Assert(cache.RandLeaderRegion(i, core.HealthRegion()), IsNil)
 	}
-	for i := uint64(0); i < n; i++ {
+	for i := range n {
 		c.Assert(cache.RandFollowerRegion(i, core.HealthRegion()), IsNil)
 	}
 }
@@ -1141,7 +1139,7 @@ func (s *testClusterUtilSuite) TestCheckStaleRegion(c *C) {
 
 func mustSaveStores(c *C, s *core.Storage, n int) []*metapb.Store {
 	stores := make([]*metapb.Store, 0, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		store := &metapb.Store{Id: uint64(i)}
 		stores = append(stores, store)
 	}

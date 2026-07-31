@@ -43,7 +43,7 @@ const (
 
 type Operator struct {
 	Type OperatorType
-	Data interface{}
+	Data any
 }
 
 type OpAddPeer struct {

@@ -3,7 +3,8 @@ package runner
 import (
 	"encoding/binary"
 	"io"
-	"io/ioutil"
+	"os"
+
 	"testing"
 
 	"github.com/Connor1996/badger"
@@ -40,7 +41,7 @@ func newEnginesWithKVDb(t *testing.T, kv *badger.DB) *engine_util.Engines {
 	engines := new(engine_util.Engines)
 	engines.Kv = kv
 	var err error
-	engines.RaftPath, err = ioutil.TempDir("", "tinykv_raft")
+	engines.RaftPath, err = os.MkdirTemp("", "tinykv_raft")
 	require.Nil(t, err)
 	raftOpts := badger.DefaultOptions
 	raftOpts.Dir = engines.RaftPath
@@ -118,7 +119,7 @@ func TestGcRaftLog(t *testing.T) {
 	//  generate raft logs
 	regionId := uint64(1)
 	raftWb := new(engine_util.WriteBatch)
-	for i := uint64(0); i < 100; i++ {
+	for i := range uint64(100) {
 		raftWb.SetMeta(meta.RaftLogKey(regionId, i), &eraftpb.Entry{Data: []byte("entry")})
 	}
 	raftWb.WriteToDB(raftDb)

@@ -16,17 +16,17 @@ package cache
 // Item is the cache entry.
 type Item struct {
 	Key   uint64
-	Value interface{}
+	Value any
 }
 
 // Cache is an interface for cache system
 type Cache interface {
 	// Put puts an item into cache.
-	Put(key uint64, value interface{})
+	Put(key uint64, value any)
 	// Get retrives an item from cache.
-	Get(key uint64) (interface{}, bool)
+	Get(key uint64) (any, bool)
 	// Peek reads an item from cache. The action is no considered 'Use'.
-	Peek(key uint64) (interface{}, bool)
+	Peek(key uint64) (any, bool)
 	// Remove eliminates an item from cache.
 	Remove(key uint64)
 	// Elems return all items in cache.

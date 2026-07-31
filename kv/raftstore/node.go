@@ -129,7 +129,7 @@ const (
 )
 
 func (n *Node) checkClusterBootstrapped(ctx context.Context) (bool, error) {
-	for i := 0; i < MaxCheckClusterBootstrappedRetryCount; i++ {
+	for range MaxCheckClusterBootstrappedRetryCount {
 		bootstrapped, err := n.schedulerClient.IsBootstrapped(ctx)
 		if err == nil {
 			return bootstrapped, nil
@@ -157,7 +157,7 @@ func (n *Node) prepareBootstrapCluster(ctx context.Context, engines *engine_util
 
 func (n *Node) BootstrapCluster(ctx context.Context, engines *engine_util.Engines, firstRegion *metapb.Region) (newCluster bool, err error) {
 	regionID := firstRegion.GetId()
-	for retry := 0; retry < MaxCheckClusterBootstrappedRetryCount; retry++ {
+	for retry := range MaxCheckClusterBootstrappedRetryCount {
 		if retry != 0 {
 			time.Sleep(time.Second)
 		}

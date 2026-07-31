@@ -94,7 +94,7 @@ func TestLeaderBcastBeat2AA(t *testing.T) {
 	r.Step(pb.Message{MsgType: pb.MessageType_MsgPropose, Entries: []*pb.Entry{{}}})
 	r.readMessages() // clear message
 
-	for i := 0; i < hi; i++ {
+	for range hi {
 		r.tick()
 	}
 
@@ -322,7 +322,7 @@ func testNonleadersElectionTimeoutNonconflict(t *testing.T, state StateType) {
 		rs[k] = newTestRaft(ids[k], ids, et, 1, NewMemoryStorage())
 	}
 	conflicts := 0
-	for round := 0; round < 1000; round++ {
+	for range 1000 {
 		for _, r := range rs {
 			switch state {
 			case StateFollower:

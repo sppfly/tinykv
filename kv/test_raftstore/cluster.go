@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
+
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -58,7 +58,7 @@ func (c *Cluster) Start() {
 	clusterID := c.schedulerClient.GetClusterID(ctx)
 
 	for storeID := uint64(1); storeID <= uint64(c.count); storeID++ {
-		dbPath, err := ioutil.TempDir("", c.baseDir)
+		dbPath, err := os.MkdirTemp("", c.baseDir)
 		if err != nil {
 			panic(err)
 		}
@@ -256,7 +256,7 @@ func (c *Cluster) CallCommandOnLeader(request *raft_cmdpb.RaftCmdRequest, timeou
 }
 
 func (c *Cluster) LeaderOfRegion(regionID uint64) *metapb.Peer {
-	for i := 0; i < 500; i++ {
+	for range 500 {
 		_, leader, err := c.schedulerClient.GetRegionByID(context.TODO(), regionID)
 		if err == nil && leader != nil {
 			return leader
@@ -267,7 +267,7 @@ func (c *Cluster) LeaderOfRegion(regionID uint64) *metapb.Peer {
 }
 
 func (c *Cluster) GetRegion(key []byte) *metapb.Region {
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		region, _, _ := c.schedulerClient.GetRegion(context.TODO(), key)
 		if region != nil {
 			return region
@@ -435,7 +435,7 @@ func (c *Cluster) MustRemovePeer(regionID uint64, peer *metapb.Peer) {
 }
 
 func (c *Cluster) MustHavePeer(regionID uint64, peer *metapb.Peer) {
-	for i := 0; i < 500; i++ {
+	for range 500 {
 		region, _, err := c.schedulerClient.GetRegionByID(context.TODO(), regionID)
 		if err != nil {
 			panic(err)
@@ -453,7 +453,7 @@ func (c *Cluster) MustHavePeer(regionID uint64, peer *metapb.Peer) {
 }
 
 func (c *Cluster) MustNonePeer(regionID uint64, peer *metapb.Peer) {
-	for i := 0; i < 500; i++ {
+	for range 500 {
 		region, _, err := c.schedulerClient.GetRegionByID(context.TODO(), regionID)
 		if err != nil {
 			panic(err)

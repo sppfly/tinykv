@@ -25,7 +25,7 @@ var _ = Suite(&testTimeSuite{})
 type testTimeSuite struct{}
 
 func (s *testTimeSuite) TestParseTimestap(c *C) {
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		t := time.Now().Add(time.Second * time.Duration(rand.Int31n(1000)))
 		data := Uint64ToBytes(uint64(t.UnixNano()))
 		nt, err := ParseTimestamp(data)
@@ -39,7 +39,7 @@ func (s *testTimeSuite) TestParseTimestap(c *C) {
 }
 
 func (s *testTimeSuite) TestSubTimeByWallClock(c *C) {
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		r := rand.Int31n(1000)
 		t1 := time.Now()
 		t2 := t1.Add(time.Second * time.Duration(r))

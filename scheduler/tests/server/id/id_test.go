@@ -51,7 +51,7 @@ func (s *testAllocIDSuite) TestID(c *C) {
 
 	leaderServer := cluster.GetServer(cluster.GetLeader())
 	var last uint64
-	for i := uint64(0); i < allocStep; i++ {
+	for range allocStep {
 		id, err := leaderServer.GetAllocator().Alloc()
 		c.Assert(err, IsNil)
 		c.Assert(id, Greater, last)
@@ -63,12 +63,10 @@ func (s *testAllocIDSuite) TestID(c *C) {
 	var m sync.Mutex
 	ids := make(map[uint64]struct{})
 
-	for i := 0; i < 10; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+	for range 10 {
+		wg.Go(func() {
 
-			for i := 0; i < 200; i++ {
+			for range 200 {
 				id, err := leaderServer.GetAllocator().Alloc()
 				c.Assert(err, IsNil)
 				m.Lock()
@@ -77,7 +75,7 @@ func (s *testAllocIDSuite) TestID(c *C) {
 				m.Unlock()
 				c.Assert(ok, IsFalse)
 			}
-		}()
+		})
 	}
 
 	wg.Wait()
@@ -100,7 +98,7 @@ func (s *testAllocIDSuite) TestCommand(c *C) {
 
 	grpcPDClient := testutil.MustNewGrpcClient(c, leaderServer.GetAddr())
 	var last uint64
-	for i := uint64(0); i < 2*allocStep; i++ {
+	for range 2 * allocStep {
 		resp, err := grpcPDClient.AllocID(context.Background(), req)
 		c.Assert(err, IsNil)
 		c.Assert(resp.GetId(), Greater, last)

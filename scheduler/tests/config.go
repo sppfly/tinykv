@@ -15,7 +15,8 @@ package tests
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
+
 	"strings"
 
 	"github.com/pingcap-incubator/tinykv/scheduler/pkg/tempurl"
@@ -33,7 +34,7 @@ type serverConfig struct {
 }
 
 func newServerConfig(name string, cc *clusterConfig) *serverConfig {
-	tempDir, _ := ioutil.TempDir("/tmp", "pd-tests")
+	tempDir, _ := os.MkdirTemp("/tmp", "pd-tests")
 	return &serverConfig{
 		Name:          name,
 		DataDir:       tempDir,
@@ -72,7 +73,7 @@ type clusterConfig struct {
 
 func newClusterConfig(n int) *clusterConfig {
 	var cc clusterConfig
-	for i := 0; i < n; i++ {
+	for range n {
 		c := newServerConfig(cc.nextServerName(), &cc)
 		cc.InitialServers = append(cc.InitialServers, c)
 	}

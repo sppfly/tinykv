@@ -30,7 +30,7 @@ func (s *testRegionSuite) TestRegionInfo(c *C) {
 	n := uint64(3)
 
 	peers := make([]*metapb.Peer, 0, n)
-	for i := uint64(0); i < n; i++ {
+	for i := range n {
 		p := &metapb.Peer{
 			Id:      i,
 			StoreId: i,
@@ -50,14 +50,14 @@ func (s *testRegionSuite) TestRegionInfo(c *C) {
 	r := info.Clone()
 	c.Assert(r, DeepEquals, info)
 
-	for i := uint64(0); i < n; i++ {
+	for i := range n {
 		c.Assert(r.GetPeer(i), Equals, r.meta.Peers[i])
 	}
 	c.Assert(r.GetPeer(n), IsNil)
 	c.Assert(r.GetPendingPeer(n), IsNil)
 	c.Assert(r.GetPendingPeer(pendingPeer.GetId()), DeepEquals, pendingPeer)
 
-	for i := uint64(0); i < n; i++ {
+	for i := range n {
 		c.Assert(r.GetStorePeer(i).GetStoreId(), Equals, i)
 	}
 	c.Assert(r.GetStorePeer(n), IsNil)
@@ -80,7 +80,7 @@ func (s *testRegionSuite) TestRegionInfo(c *C) {
 
 	stores := r.GetStoreIds()
 	c.Assert(stores, HasLen, int(n))
-	for i := uint64(0); i < n; i++ {
+	for i := range n {
 		_, ok := stores[i]
 		c.Assert(ok, IsTrue)
 	}
@@ -209,13 +209,13 @@ func (s *testRegionSuite) TestRegionTreeSplitAndMerge(c *C) {
 	n := 7
 
 	// Split.
-	for i := 0; i < n; i++ {
+	for range n {
 		regions = SplitRegions(regions)
 		updateRegions(c, tree, regions)
 	}
 
 	// Merge.
-	for i := 0; i < n; i++ {
+	for range n {
 		regions = MergeRegions(regions)
 		updateRegions(c, tree, regions)
 	}
@@ -339,7 +339,7 @@ func newRegionItem(start, end []byte) *regionItem {
 func BenchmarkRegionTreeUpdate(b *testing.B) {
 	tree := newRegionTree()
 	for i := 0; i < b.N; i++ {
-		item := &RegionInfo{meta: &metapb.Region{StartKey: []byte(fmt.Sprintf("%20d", i)), EndKey: []byte(fmt.Sprintf("%20d", i+1))}}
+		item := &RegionInfo{meta: &metapb.Region{StartKey: fmt.Appendf(nil, "%20d", i), EndKey: fmt.Appendf(nil, "%20d", i+1)}}
 		tree.update(item)
 	}
 }
@@ -349,7 +349,7 @@ const MaxKey = 10000000
 func BenchmarkRegionTreeUpdateUnordered(b *testing.B) {
 	tree := newRegionTree()
 	var items []*RegionInfo
-	for i := 0; i < MaxKey; i++ {
+	for range MaxKey {
 		var startKey, endKey int
 		key1 := rand.Intn(MaxKey)
 		key2 := rand.Intn(MaxKey)
@@ -360,7 +360,7 @@ func BenchmarkRegionTreeUpdateUnordered(b *testing.B) {
 			startKey = key2
 			endKey = key1
 		}
-		items = append(items, &RegionInfo{meta: &metapb.Region{StartKey: []byte(fmt.Sprintf("%20d", startKey)), EndKey: []byte(fmt.Sprintf("%20d", endKey))}})
+		items = append(items, &RegionInfo{meta: &metapb.Region{StartKey: fmt.Appendf(nil, "%20d", startKey), EndKey: fmt.Appendf(nil, "%20d", endKey)}})
 	}
 
 	b.ResetTimer()

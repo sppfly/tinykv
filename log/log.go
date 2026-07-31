@@ -73,59 +73,59 @@ func SetFlags(flags int) {
 	_log._log.SetFlags(flags)
 }
 
-func Info(v ...interface{}) {
+func Info(v ...any) {
 	_log.Info(v...)
 }
 
-func Infof(format string, v ...interface{}) {
+func Infof(format string, v ...any) {
 	_log.Infof(format, v...)
 }
 
-func Panic(v ...interface{}) {
+func Panic(v ...any) {
 	_log.Panic(v...)
 }
 
-func Panicf(format string, v ...interface{}) {
+func Panicf(format string, v ...any) {
 	_log.Panicf(format, v...)
 }
 
-func Debug(v ...interface{}) {
+func Debug(v ...any) {
 	_log.Debug(v...)
 }
 
-func Debugf(format string, v ...interface{}) {
+func Debugf(format string, v ...any) {
 	_log.Debugf(format, v...)
 }
 
-func Warn(v ...interface{}) {
+func Warn(v ...any) {
 	_log.Warning(v...)
 }
 
-func Warnf(format string, v ...interface{}) {
+func Warnf(format string, v ...any) {
 	_log.Warningf(format, v...)
 }
 
-func Warning(v ...interface{}) {
+func Warning(v ...any) {
 	_log.Warning(v...)
 }
 
-func Warningf(format string, v ...interface{}) {
+func Warningf(format string, v ...any) {
 	_log.Warningf(format, v...)
 }
 
-func Error(v ...interface{}) {
+func Error(v ...any) {
 	_log.Error(v...)
 }
 
-func Errorf(format string, v ...interface{}) {
+func Errorf(format string, v ...any) {
 	_log.Errorf(format, v...)
 }
 
-func Fatal(v ...interface{}) {
+func Fatal(v ...any) {
 	_log.Fatal(v...)
 }
 
-func Fatalf(format string, v ...interface{}) {
+func Fatalf(format string, v ...any) {
 	_log.Fatalf(format, v...)
 }
 
@@ -163,11 +163,11 @@ func (l *Logger) SetLevelByString(level string) {
 	l.level = StringToLogLevel(level)
 }
 
-func (l *Logger) log(t LogType, v ...interface{}) {
+func (l *Logger) log(t LogType, v ...any) {
 	l.logf(t, "%v\n", v)
 }
 
-func (l *Logger) logf(t LogType, format string, v ...interface{}) {
+func (l *Logger) logf(t LogType, format string, v ...any) {
 	if l.level|LogLevel(t) != l.level {
 		return
 	}
@@ -182,53 +182,53 @@ func (l *Logger) logf(t LogType, format string, v ...interface{}) {
 	l._log.Output(4, s)
 }
 
-func (l *Logger) Fatal(v ...interface{}) {
+func (l *Logger) Fatal(v ...any) {
 	l.log(LOG_FATAL, v...)
 	os.Exit(-1)
 }
 
-func (l *Logger) Fatalf(format string, v ...interface{}) {
+func (l *Logger) Fatalf(format string, v ...any) {
 	l.logf(LOG_FATAL, format, v...)
 	os.Exit(-1)
 }
 
-func (l *Logger) Panic(v ...interface{}) {
+func (l *Logger) Panic(v ...any) {
 	l._log.Panic(v...)
 }
 
-func (l *Logger) Panicf(format string, v ...interface{}) {
+func (l *Logger) Panicf(format string, v ...any) {
 	l._log.Panicf(format, v...)
 }
 
-func (l *Logger) Error(v ...interface{}) {
+func (l *Logger) Error(v ...any) {
 	l.log(LOG_ERROR, v...)
 }
 
-func (l *Logger) Errorf(format string, v ...interface{}) {
+func (l *Logger) Errorf(format string, v ...any) {
 	l.logf(LOG_ERROR, format, v...)
 }
 
-func (l *Logger) Warning(v ...interface{}) {
+func (l *Logger) Warning(v ...any) {
 	l.log(LOG_WARNING, v...)
 }
 
-func (l *Logger) Warningf(format string, v ...interface{}) {
+func (l *Logger) Warningf(format string, v ...any) {
 	l.logf(LOG_WARNING, format, v...)
 }
 
-func (l *Logger) Debug(v ...interface{}) {
+func (l *Logger) Debug(v ...any) {
 	l.log(LOG_DEBUG, v...)
 }
 
-func (l *Logger) Debugf(format string, v ...interface{}) {
+func (l *Logger) Debugf(format string, v ...any) {
 	l.logf(LOG_DEBUG, format, v...)
 }
 
-func (l *Logger) Info(v ...interface{}) {
+func (l *Logger) Info(v ...any) {
 	l.log(LOG_INFO, v...)
 }
 
-func (l *Logger) Infof(format string, v ...interface{}) {
+func (l *Logger) Infof(format string, v ...any) {
 	l.logf(LOG_INFO, format, v...)
 }
 

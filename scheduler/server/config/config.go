@@ -308,11 +308,12 @@ func (m *configMetaData) CheckUndecoded() error {
 	if len(undecoded) == 0 {
 		return nil
 	}
-	errInfo := "Config contains undefined item: "
+	var errInfo strings.Builder
+	errInfo.WriteString("Config contains undefined item: ")
 	for _, key := range undecoded {
-		errInfo += key.String() + ", "
+		errInfo.WriteString(key.String() + ", ")
 	}
-	return errors.New(errInfo[:len(errInfo)-2])
+	return errors.New(errInfo.String()[:len(errInfo.String())-2])
 }
 
 // Adjust is used to adjust the PD configurations.

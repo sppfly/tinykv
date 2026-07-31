@@ -27,7 +27,7 @@ import (
 
 func init() {
 	schedule.RegisterSliceDecoderBuilder("balance-leader", func(args []string) schedule.ConfigDecoder {
-		return func(v interface{}) error {
+		return func(v any) error {
 			return nil
 		}
 	})
@@ -97,7 +97,7 @@ func (l *balanceLeaderScheduler) Schedule(cluster opt.Cluster) *operator.Operato
 			source := sources[i]
 			sourceID := source.GetID()
 			log.Debug("store leader score", zap.String("scheduler", l.GetName()), zap.Uint64("source-store", sourceID))
-			for j := 0; j < balanceLeaderRetryLimit; j++ {
+			for range balanceLeaderRetryLimit {
 				if op := l.transferLeaderOut(cluster, source); op != nil {
 					return op
 				}
@@ -109,7 +109,7 @@ func (l *balanceLeaderScheduler) Schedule(cluster opt.Cluster) *operator.Operato
 			targetID := target.GetID()
 			log.Debug("store leader score", zap.String("scheduler", l.GetName()), zap.Uint64("target-store", targetID))
 
-			for j := 0; j < balanceLeaderRetryLimit; j++ {
+			for range balanceLeaderRetryLimit {
 				if op := l.transferLeaderIn(cluster, target); op != nil {
 					return op
 				}

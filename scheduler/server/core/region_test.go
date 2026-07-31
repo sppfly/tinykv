@@ -132,8 +132,8 @@ func (*testRegionKey) TestRegionKey(c *C) {
 
 func BenchmarkRandomRegion(b *testing.B) {
 	regions := NewRegionsInfo()
-	for i := 0; i < 5000000; i++ {
-		item := &RegionInfo{meta: &metapb.Region{StartKey: []byte(fmt.Sprintf("%20d", i)), EndKey: []byte(fmt.Sprintf("%20d", i+1))}}
+	for i := range 5000000 {
+		item := &RegionInfo{meta: &metapb.Region{StartKey: fmt.Appendf(nil, "%20d", i), EndKey: fmt.Appendf(nil, "%20d", i+1)}}
 		regions.AddRegion(item)
 	}
 	b.ResetTimer()
@@ -158,7 +158,7 @@ func newRegionInfoID(idAllocator id.Allocator) *RegionInfo {
 		peers  []*metapb.Peer
 		leader *metapb.Peer
 	)
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		id, _ := idAllocator.Alloc()
 		p := &metapb.Peer{Id: id, StoreId: id}
 		if i == 0 {
@@ -182,7 +182,7 @@ func BenchmarkAddRegion(b *testing.B) {
 	regions := NewRegionsInfo()
 	idAllocator := mockid.NewIDAllocator()
 	var items []*RegionInfo
-	for i := 0; i < 10000000; i++ {
+	for range 10000000 {
 		items = append(items, newRegionInfoID(idAllocator))
 	}
 	b.ResetTimer()

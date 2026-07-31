@@ -131,9 +131,7 @@ func (s *serverTestSuite) TestLeaderTransfer(c *C) {
 	// Start a goroutine the make sure TS won't fall back.
 	quit := make(chan struct{})
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		for {
 			select {
 			case <-quit:
@@ -149,7 +147,7 @@ func (s *serverTestSuite) TestLeaderTransfer(c *C) {
 			}
 			time.Sleep(time.Millisecond)
 		}
-	}()
+	})
 	// Transfer leader.
 	etcdCli, err := clientv3.New(clientv3.Config{
 		Endpoints:   endpoints,
@@ -157,7 +155,7 @@ func (s *serverTestSuite) TestLeaderTransfer(c *C) {
 	})
 	c.Assert(err, IsNil)
 	leaderPath := filepath.Join("/pd", strconv.FormatUint(cli.GetClusterID(context.Background()), 10), "leader")
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		cluster.WaitLeader()
 		_, err = etcdCli.Delete(context.TODO(), leaderPath)
 		c.Assert(err, IsNil)

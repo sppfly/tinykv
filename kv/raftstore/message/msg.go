@@ -43,14 +43,14 @@ const (
 type Msg struct {
 	Type     MsgType
 	RegionID uint64
-	Data     interface{}
+	Data     any
 }
 
-func NewMsg(tp MsgType, data interface{}) Msg {
+func NewMsg(tp MsgType, data any) Msg {
 	return Msg{Type: tp, Data: data}
 }
 
-func NewPeerMsg(tp MsgType, regionID uint64, data interface{}) Msg {
+func NewPeerMsg(tp MsgType, regionID uint64, data any) Msg {
 	return Msg{Type: tp, RegionID: regionID, Data: data}
 }
 

@@ -43,24 +43,24 @@ type Scheduler interface {
 }
 
 // EncodeConfig encode the custom config for each scheduler.
-func EncodeConfig(v interface{}) ([]byte, error) {
+func EncodeConfig(v any) ([]byte, error) {
 	return json.Marshal(v)
 }
 
 // DecodeConfig decode the custom config for each scheduler.
-func DecodeConfig(data []byte, v interface{}) error {
+func DecodeConfig(data []byte, v any) error {
 	return json.Unmarshal(data, v)
 }
 
 // ConfigDecoder used to decode the config.
-type ConfigDecoder func(v interface{}) error
+type ConfigDecoder func(v any) error
 
 // ConfigSliceDecoderBuilder used to build slice decoder of the config.
 type ConfigSliceDecoderBuilder func([]string) ConfigDecoder
 
-//ConfigJSONDecoder used to build a json decoder of the config.
+// ConfigJSONDecoder used to build a json decoder of the config.
 func ConfigJSONDecoder(data []byte) ConfigDecoder {
-	return func(v interface{}) error {
+	return func(v any) error {
 		return DecodeConfig(data, v)
 	}
 }
@@ -69,7 +69,7 @@ func ConfigJSONDecoder(data []byte) ConfigDecoder {
 func ConfigSliceDecoder(name string, args []string) ConfigDecoder {
 	builder, ok := schedulerArgsToDecoder[name]
 	if !ok {
-		return func(v interface{}) error {
+		return func(v any) error {
 			return errors.Errorf("the config decoer do not register for %s", name)
 		}
 	}

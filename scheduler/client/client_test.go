@@ -113,7 +113,7 @@ func (s *testClientSuite) TearDownSuite(c *C) {
 }
 
 func mustWaitLeader(c *C, svrs map[string]*server.Server) *server.Server {
-	for i := 0; i < 500; i++ {
+	for range 500 {
 		for _, s := range svrs {
 			if !s.IsClosed() && s.GetMember().IsLeader() {
 				return s
@@ -142,7 +142,7 @@ func bootstrapServer(c *C, header *schedulerpb.RequestHeader, client schedulerpb
 
 func (s *testClientSuite) TestTSO(c *C) {
 	var tss []int64
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		p, l, err := s.client.GetTS(context.Background())
 		c.Assert(err, IsNil)
 		tss = append(tss, p<<18+l)
@@ -160,10 +160,10 @@ func (s *testClientSuite) TestTSORace(c *C) {
 	begin := make(chan struct{})
 	count := 10
 	wg.Add(count)
-	for i := 0; i < count; i++ {
+	for range count {
 		go func() {
 			<-begin
-			for i := 0; i < 100; i++ {
+			for range 100 {
 				_, _, err := s.client.GetTS(context.Background())
 				c.Assert(err, IsNil)
 			}
@@ -204,7 +204,7 @@ func (s *testClientSuite) TestGetRegion(c *C) {
 func (s *testClientSuite) TestGetPrevRegion(c *C) {
 	regionLen := 10
 	regions := make([]*metapb.Region, 0, regionLen)
-	for i := 0; i < regionLen; i++ {
+	for i := range regionLen {
 		regionID := regionIDAllocator.alloc()
 		r := &metapb.Region{
 			Id: regionID,
@@ -225,7 +225,7 @@ func (s *testClientSuite) TestGetPrevRegion(c *C) {
 		err := s.regionHeartbeat.Send(req)
 		c.Assert(err, IsNil)
 	}
-	for i := 0; i < 20; i++ {
+	for i := range 20 {
 		testutil.WaitUntil(c, func(c *C) bool {
 			r, leader, err := s.client.GetPrevRegion(context.Background(), []byte{byte(i)})
 			c.Assert(err, IsNil)
@@ -243,7 +243,7 @@ func (s *testClientSuite) TestGetPrevRegion(c *C) {
 func (s *testClientSuite) TestScanRegions(c *C) {
 	regionLen := 10
 	regions := make([]*metapb.Region, 0, regionLen)
-	for i := 0; i < regionLen; i++ {
+	for i := range regionLen {
 		regionID := regionIDAllocator.alloc()
 		r := &metapb.Region{
 			Id: regionID,

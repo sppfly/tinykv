@@ -93,7 +93,7 @@ func NewTransferLeaderCmd(peer *metapb.Peer) *raft_cmdpb.AdminRequest {
 }
 
 func MustGetCf(engine *engine_util.Engines, cf string, key []byte, value []byte) {
-	for i := 0; i < 300; i++ {
+	for range 300 {
 		val, err := engine_util.GetCF(engine.Kv, cf, key)
 		if err == nil && (value == nil || bytes.Compare(val, value) == 0) {
 			return
@@ -114,7 +114,7 @@ func MustGetEqual(engine *engine_util.Engines, key []byte, value []byte) {
 func MustGetCfNone(engine *engine_util.Engines, cf string, key []byte) {
 	var val []byte
 	var err error
-	for i := 0; i < 300; i++ {
+	for range 300 {
 		val, err = engine_util.GetCF(engine.Kv, cf, key)
 		if err == badger.ErrKeyNotFound {
 			return

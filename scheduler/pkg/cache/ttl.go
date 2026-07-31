@@ -23,7 +23,7 @@ import (
 )
 
 type ttlCacheItem struct {
-	value  interface{}
+	value  any
 	expire time.Time
 }
 
@@ -51,12 +51,12 @@ func NewTTL(ctx context.Context, gcInterval time.Duration, ttl time.Duration) *T
 }
 
 // Put puts an item into cache.
-func (c *TTL) Put(key uint64, value interface{}) {
+func (c *TTL) Put(key uint64, value any) {
 	c.PutWithTTL(key, value, c.ttl)
 }
 
 // PutWithTTL puts an item into cache with specified TTL.
-func (c *TTL) PutWithTTL(key uint64, value interface{}, ttl time.Duration) {
+func (c *TTL) PutWithTTL(key uint64, value any, ttl time.Duration) {
 	c.Lock()
 	defer c.Unlock()
 
@@ -67,7 +67,7 @@ func (c *TTL) PutWithTTL(key uint64, value interface{}, ttl time.Duration) {
 }
 
 // Get retrives an item from cache.
-func (c *TTL) Get(key uint64) (interface{}, bool) {
+func (c *TTL) Get(key uint64) (any, bool) {
 	c.RLock()
 	defer c.RUnlock()
 

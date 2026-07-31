@@ -85,8 +85,8 @@ func (builder *testBuilder) init(values []kv) {
 	}
 }
 
-func (builder *testBuilder) runRequests(reqs ...interface{}) []interface{} {
-	var result []interface{}
+func (builder *testBuilder) runRequests(reqs ...any) []any {
+	var result []any
 	for _, req := range reqs {
 		reqName := fmt.Sprintf("%v", reflect.TypeOf(req))
 		reqName = strings.TrimPrefix(strings.TrimSuffix(reqName, "Request"), "*kvrpcpb.")
@@ -105,7 +105,7 @@ func (builder *testBuilder) runRequests(reqs ...interface{}) []interface{} {
 }
 
 // runOneCmd is like runCommands but only runs a single command.
-func (builder *testBuilder) runOneRequest(req interface{}) interface{} {
+func (builder *testBuilder) runOneRequest(req any) any {
 	return builder.runRequests(req)[0]
 }
 

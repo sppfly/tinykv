@@ -15,7 +15,7 @@ package kv
 
 import (
 	"fmt"
-	"io/ioutil"
+
 	"net/url"
 	"os"
 	"path"
@@ -94,7 +94,7 @@ func (s *testEtcdKVSuite) TestEtcdKV(c *C) {
 func newTestSingleConfig() *embed.Config {
 	cfg := embed.NewConfig()
 	cfg.Name = "test_etcd"
-	cfg.Dir, _ = ioutil.TempDir("/tmp", "test_etcd")
+	cfg.Dir, _ = os.MkdirTemp("/tmp", "test_etcd")
 	cfg.WalDir = ""
 	cfg.Logger = "zap"
 	cfg.LogOutputs = []string{"stdout"}

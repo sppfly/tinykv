@@ -387,7 +387,7 @@ func (c *TestCluster) GetLeader() string {
 // WaitLeader is used to get leader.
 // If it exceeds the maximum number of loops, it will return an empty string.
 func (c *TestCluster) WaitLeader() string {
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		counter := make(map[string]int)
 		running := 0
 		for _, s := range c.servers {

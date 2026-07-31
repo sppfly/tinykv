@@ -4,7 +4,7 @@ import "sync"
 
 type TaskStop struct{}
 
-type Task interface{}
+type Task any
 
 type Worker struct {
 	name     string
@@ -23,9 +23,7 @@ type Starter interface {
 }
 
 func (w *Worker) Start(handler TaskHandler) {
-	w.wg.Add(1)
-	go func() {
-		defer w.wg.Done()
+	w.wg.Go(func() {
 		if s, ok := handler.(Starter); ok {
 			s.Start()
 		}
@@ -36,7 +34,7 @@ func (w *Worker) Start(handler TaskHandler) {
 			}
 			handler.Handle(Task)
 		}
-	}()
+	})
 }
 
 func (w *Worker) Sender() chan<- Task {

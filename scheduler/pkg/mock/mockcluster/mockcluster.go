@@ -339,8 +339,8 @@ func (mc *Cluster) MockRegionInfo(regionID uint64, leaderID uint64,
 
 	region := &metapb.Region{
 		Id:          regionID,
-		StartKey:    []byte(fmt.Sprintf("%20d", regionID)),
-		EndKey:      []byte(fmt.Sprintf("%20d", regionID+1)),
+		StartKey:    fmt.Appendf(nil, "%20d", regionID),
+		EndKey:      fmt.Appendf(nil, "%20d", regionID+1),
 		RegionEpoch: epoch,
 	}
 	leader, _ := mc.AllocPeer(leaderID)

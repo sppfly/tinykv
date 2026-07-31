@@ -36,7 +36,7 @@ type CheckFunc func(c *check.C) bool
 // WaitUntil repeatly evaluates f() for a period of time, util it returns true.
 func WaitUntil(c *check.C, f CheckFunc) {
 	c.Log("wait start")
-	for i := 0; i < waitMaxRetry; i++ {
+	for range waitMaxRetry {
 		if f(c) {
 			return
 		}

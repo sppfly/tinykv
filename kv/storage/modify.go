@@ -2,7 +2,7 @@ package storage
 
 // Modify is a single modification to TinyKV's underlying storage.
 type Modify struct {
-	Data interface{}
+	Data any
 }
 
 type Put struct {

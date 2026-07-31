@@ -17,7 +17,7 @@ package raft
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
+
 	"os"
 	"os/exec"
 	"sort"
@@ -25,20 +25,6 @@ import (
 
 	pb "github.com/pingcap-incubator/tinykv/proto/pkg/eraftpb"
 )
-
-func min(a, b uint64) uint64 {
-	if a > b {
-		return b
-	}
-	return a
-}
-
-func max(a, b uint64) uint64 {
-	if a > b {
-		return a
-	}
-	return b
-}
 
 // IsEmptyHardState returns true if the given HardState is empty.
 func IsEmptyHardState(st pb.HardState) bool {
@@ -89,7 +75,7 @@ func diffu(a, b string) string {
 }
 
 func mustTemp(pre, body string) string {
-	f, err := ioutil.TempFile("", pre)
+	f, err := os.CreateTemp("", pre)
 	if err != nil {
 		panic(err)
 	}
@@ -102,12 +88,13 @@ func mustTemp(pre, body string) string {
 }
 
 func ltoa(l *RaftLog) string {
-	s := fmt.Sprintf("committed: %d\n", l.committed)
-	s += fmt.Sprintf("applied:  %d\n", l.applied)
+	var s strings.Builder
+	fmt.Fprintf(&s, "committed: %d\n", l.committed)
+	fmt.Fprintf(&s, "applied:  %d\n", l.applied)
 	for i, e := range l.entries {
-		s += fmt.Sprintf("#%d: %+v\n", i, e)
+		fmt.Fprintf(&s, "#%d: %+v\n", i, e)
 	}
-	return s
+	return s.String()
 }
 
 type uint64Slice []uint64

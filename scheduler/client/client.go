@@ -180,7 +180,7 @@ func (c *client) updateURLs(members []*schedulerpb.Member) {
 
 func (c *client) initRetry(f func() error) error {
 	var err error
-	for i := 0; i < maxInitClusterRetries; i++ {
+	for range maxInitClusterRetries {
 		if err = f(); err == nil {
 			return nil
 		}
@@ -374,7 +374,7 @@ func (c *client) tsLoop() {
 		case first := <-c.tsoRequests:
 			requests = append(requests, first)
 			pending := len(c.tsoRequests)
-			for i := 0; i < pending; i++ {
+			for range pending {
 				requests = append(requests, <-c.tsoRequests)
 			}
 			done := make(chan struct{})
@@ -459,7 +459,7 @@ func (c *client) processTSORequests(stream schedulerpb.Scheduler_TsoClient, requ
 }
 
 func (c *client) finishTSORequest(requests []*tsoRequest, physical, firstLogical int64, err error) {
-	for i := 0; i < len(requests); i++ {
+	for i := range requests {
 		if span := opentracing.SpanFromContext(requests[i].ctx); span != nil {
 			span.Finish()
 		}
@@ -470,7 +470,7 @@ func (c *client) finishTSORequest(requests []*tsoRequest, physical, firstLogical
 
 func (c *client) revokeTSORequest(err error) {
 	n := len(c.tsoRequests)
-	for i := 0; i < n; i++ {
+	for range n {
 		req := <-c.tsoRequests
 		req.done <- err
 	}
@@ -523,7 +523,7 @@ func (c *client) GetURLs() []string {
 }
 
 var tsoReqPool = sync.Pool{
-	New: func() interface{} {
+	New: func() any {
 		return &tsoRequest{
 			done: make(chan error, 1),
 		}

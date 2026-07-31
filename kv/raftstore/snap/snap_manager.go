@@ -5,6 +5,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -242,11 +243,9 @@ func (sm *SnapManager) Register(key SnapKey, entry SnapEntry) {
 	defer sm.registryLock.Unlock()
 	entries, ok := sm.registry[key]
 	if ok {
-		for _, e := range entries {
-			if e == entry {
-				log.Warnf("%s is registered more than 1 time", key)
-				return
-			}
+		if slices.Contains(entries, entry) {
+			log.Warnf("%s is registered more than 1 time", key)
+			return
 		}
 	}
 	entries = append(entries, entry)

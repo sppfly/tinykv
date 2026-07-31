@@ -41,7 +41,7 @@ func perm(n int) (out []Item) {
 
 // rang returns an ordered list of Int items in the range [0, n).
 func rang(n int) (out []Item) {
-	for i := 0; i < n; i++ {
+	for i := range n {
 		out = append(out, Int(i))
 	}
 	return
@@ -73,7 +73,7 @@ func allrev(t *BTree) (out []Item) {
 	return
 }
 
-func assertEq(t *testing.T, desc string, got, need interface{}) {
+func assertEq(t *testing.T, desc string, got, need any) {
 	if !reflect.DeepEqual(need, got) {
 		t.Fatalf("%s failed: need %T %v, but got %T %v", desc, need, need, got, got)
 	}
@@ -90,10 +90,10 @@ func TestBTreeSizeInfo(t *testing.T) {
 		assertEq(t, "check min", tr.GetAt(0), tr.Min())
 		assertEq(t, "check max", tr.GetAt(tr.Len()-1), tr.Max())
 	}
-	for k := 0; k < maxElt; k++ {
+	for k := range maxElt {
 		assertEq(t, "get k-th", tr.GetAt(k), Int(k))
 	}
-	for x := 0; x < maxElt; x++ {
+	for x := range maxElt {
 		y, rk := tr.GetWithIndex(Int(x))
 		assertEq(t, "get", y, Int(x))
 		assertEq(t, "get rank", rk, x)
@@ -115,10 +115,10 @@ func TestBTreeSizeInfo(t *testing.T) {
 		assertEq(t, "after delete check min", tr.GetAt(0), tr.Min())
 		assertEq(t, "after delete check max", tr.GetAt(tr.Len()-1), tr.Max())
 	}
-	for k := 0; k < maxElt/3; k++ {
+	for k := range maxElt / 3 {
 		assertEq(t, "after delete get k-th", tr.GetAt(k), Int(3*k))
 	}
-	for x := 0; x < maxElt; x++ {
+	for x := range maxElt {
 		y, rk := tr.GetWithIndex(Int(x))
 		if x%3 == 0 {
 			assertEq(t, "after delete get", y, Int(x))
@@ -157,7 +157,7 @@ var btreeDegree = flag.Int("degree", 32, "B-Tree degree")
 func TestBTree(t *testing.T) {
 	tr := New(*btreeDegree)
 	const treeSize = 10000
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		if min := tr.Min(); min != nil {
 			t.Fatalf("empty min, got %+v", min)
 		}
@@ -205,7 +205,7 @@ func TestBTree(t *testing.T) {
 
 func ExampleBTree() {
 	tr := New(*btreeDegree)
-	for i := Int(0); i < 10; i++ {
+	for i := range Int(10) {
 		tr.ReplaceOrInsert(i)
 	}
 	fmt.Println("len:       ", tr.Len())
@@ -761,13 +761,11 @@ func TestCloneConcurrentOperations(t *testing.T) {
 	toRemove := rang(cloneTestSize)[cloneTestSize/2:]
 	for i := 0; i < len(trees)/2; i++ {
 		tree := trees[i]
-		wg.Add(1)
-		go func() {
+		wg.Go(func() {
 			for _, item := range toRemove {
 				tree.Delete(item)
 			}
-			wg.Done()
-		}()
+		})
 	}
 	wg.Wait()
 	t.Log("Checking all values again")

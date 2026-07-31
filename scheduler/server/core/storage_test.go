@@ -57,7 +57,7 @@ func (s *testKVSuite) TestBasic(c *C) {
 
 func mustSaveStores(c *C, s *Storage, n int) []*metapb.Store {
 	stores := make([]*metapb.Store, 0, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		store := &metapb.Store{Id: uint64(i)}
 		stores = append(stores, store)
 	}
@@ -94,7 +94,7 @@ func (s *testKVSuite) TestStoreWeight(c *C) {
 	c.Assert(storage.LoadStores(cache.SetStore), IsNil)
 	leaderWeights := []float64{1.0, 2.0, 0.2}
 	regionWeights := []float64{1.0, 3.0, 0.3}
-	for i := 0; i < n; i++ {
+	for i := range n {
 		c.Assert(cache.GetStore(uint64(i)).GetLeaderWeight(), Equals, leaderWeights[i])
 		c.Assert(cache.GetStore(uint64(i)).GetRegionWeight(), Equals, regionWeights[i])
 	}

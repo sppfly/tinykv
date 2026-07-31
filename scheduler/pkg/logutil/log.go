@@ -70,7 +70,7 @@ type LogConfig struct {
 type redirectFormatter struct{}
 
 // Format implements capnslog.Formatter hook.
-func (rf *redirectFormatter) Format(pkg string, level capnslog.LogLevel, depth int, entries ...interface{}) {
+func (rf *redirectFormatter) Format(pkg string, level capnslog.LogLevel, depth int, entries ...any) {
 	if pkg != "" {
 		pkg = fmt.Sprint(pkg, ": ")
 	}
@@ -111,7 +111,7 @@ func (hook *contextHook) Fire(entry *log.Entry) error {
 	pc := make([]uintptr, 4)
 	cnt := runtime.Callers(6, pc)
 
-	for i := 0; i < cnt; i++ {
+	for i := range cnt {
 		fu := runtime.FuncForPC(pc[i] - 1)
 		name := fu.Name()
 		if !isSkippedPackageName(name) {

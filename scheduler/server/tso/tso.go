@@ -168,10 +168,10 @@ func (t *TimestampOracle) ResetUserTimestamp(tso uint64) error {
 
 // UpdateTimestamp is used to update the timestamp.
 // This function will do two things:
-// 1. When the logical time is going to be used up, the current physical time needs to increase.
-// 2. If the time window is not enough, which means the saved etcd time minus the next physical time
-//    is less than or equal to `updateTimestampGuard`, it will need to be updated and save the
-//    next physical time plus `TsoSaveInterval` into etcd.
+//  1. When the logical time is going to be used up, the current physical time needs to increase.
+//  2. If the time window is not enough, which means the saved etcd time minus the next physical time
+//     is less than or equal to `updateTimestampGuard`, it will need to be updated and save the
+//     next physical time plus `TsoSaveInterval` into etcd.
 //
 // Here is some constraints that this function must satisfy:
 // 1. The physical time is monotonically increasing.
@@ -238,7 +238,7 @@ func (t *TimestampOracle) GetRespTS(count uint32) (schedulerpb.Timestamp, error)
 		return resp, errors.New("tso count should be positive")
 	}
 
-	for i := 0; i < maxRetryCount; i++ {
+	for i := range maxRetryCount {
 		current := (*atomicObject)(atomic.LoadPointer(&t.ts))
 		if current.physical == typeutil.ZeroTime {
 			log.Error("we haven't synced timestamp ok, wait and retry", zap.Int("retry-count", i))

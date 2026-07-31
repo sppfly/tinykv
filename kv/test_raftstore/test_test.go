@@ -32,12 +32,12 @@ func runClient(t *testing.T, me int, ca chan bool, fn func(me int, t *testing.T)
 func SpawnClientsAndWait(t *testing.T, ch chan bool, ncli int, fn func(me int, t *testing.T)) {
 	defer func() { ch <- true }()
 	ca := make([]chan bool, ncli)
-	for cli := 0; cli < ncli; cli++ {
+	for cli := range ncli {
 		ca[cli] = make(chan bool)
 		go runClient(t, cli, ca[cli], fn)
 	}
 	// log.Printf("SpawnClientsAndWait: waiting for clients")
-	for cli := 0; cli < ncli; cli++ {
+	for cli := range ncli {
 		ok := <-ca[cli]
 		// log.Infof("SpawnClientsAndWait: client %d is done\n", cli)
 		if ok == false {
@@ -56,7 +56,7 @@ func NextValue(prev string, val string) string {
 // and in order
 func checkClntAppends(t *testing.T, clnt int, v string, count int) {
 	lastoff := -1
-	for j := 0; j < count; j++ {
+	for j := range count {
 		wanted := "x " + strconv.Itoa(clnt) + " " + strconv.Itoa(j) + " y"
 		off := strings.Index(v, wanted)
 		if off < 0 {
@@ -77,7 +77,7 @@ func checkClntAppends(t *testing.T, clnt int, v string, count int) {
 // and are in order for each concurrent client.
 func checkConcurrentAppends(t *testing.T, v string, counts []int) {
 	nclients := len(counts)
-	for i := 0; i < nclients; i++ {
+	for i := range nclients {
 		checkClntAppends(t, i, v, counts[i])
 	}
 }
@@ -92,7 +92,7 @@ func networkchaos(t *testing.T, cluster *Cluster, ch chan bool, done *int32, unr
 				a[i] = (rand.Int() % 2)
 			}
 			pa := make([][]uint64, 2)
-			for i := 0; i < 2; i++ {
+			for i := range 2 {
 				pa[i] = make([]uint64, 0)
 				for j := 1; j <= cluster.count; j++ {
 					if a[j-1] == i {
@@ -190,10 +190,10 @@ func GenericTest(t *testing.T, part string, nclients int, unreliable bool, crash
 	ch_confchange := make(chan bool)
 	ch_clients := make(chan bool)
 	clnts := make([]chan int, nclients)
-	for i := 0; i < nclients; i++ {
+	for i := range nclients {
 		clnts[i] = make(chan int, 1)
 	}
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		// log.Printf("Iteration %v\n", i)
 		atomic.StoreInt32(&done_clients, 0)
 		atomic.StoreInt32(&done_partitioner, 0)
@@ -268,7 +268,7 @@ func GenericTest(t *testing.T, part string, nclients int, unreliable bool, crash
 			}
 		}
 
-		for cli := 0; cli < nclients; cli++ {
+		for cli := range nclients {
 			// log.Printf("read from clients %d\n", cli)
 			j := <-clnts[cli]
 
@@ -281,7 +281,7 @@ func GenericTest(t *testing.T, part string, nclients int, unreliable bool, crash
 			v := string(bytes.Join(values, []byte("")))
 			checkClntAppends(t, cli, v, j)
 
-			for k := 0; k < j; k++ {
+			for k := range j {
 				key := strconv.Itoa(cli) + " " + fmt.Sprintf("%08d", k)
 				cluster.MustDelete([]byte(key))
 			}
@@ -467,7 +467,7 @@ func TestOneSnapshot2C(t *testing.T) {
 
 	// write some data to trigger snapshot
 	for i := 100; i < 115; i++ {
-		cluster.MustPutCF(cf, []byte(fmt.Sprintf("k%d", i)), []byte(fmt.Sprintf("v%d", i)))
+		cluster.MustPutCF(cf, fmt.Appendf(nil, "k%d", i), fmt.Appendf(nil, "v%d", i))
 	}
 	cluster.MustDeleteCF(cf, []byte("k2"))
 	time.Sleep(500 * time.Millisecond)
@@ -688,7 +688,7 @@ func TestOneSplit3B(t *testing.T) {
 
 	// write some data to trigger split
 	for i := 100; i < 200; i++ {
-		cluster.MustPut([]byte(fmt.Sprintf("k%d", i)), []byte(fmt.Sprintf("v%d", i)))
+		cluster.MustPut(fmt.Appendf(nil, "k%d", i), fmt.Appendf(nil, "v%d", i))
 	}
 
 	time.Sleep(200 * time.Millisecond)

@@ -22,7 +22,7 @@ import (
 
 func init() {
 	schedule.RegisterSliceDecoderBuilder("balance-region", func(args []string) schedule.ConfigDecoder {
-		return func(v interface{}) error {
+		return func(v any) error {
 			return nil
 		}
 	})

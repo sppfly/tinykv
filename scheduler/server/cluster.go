@@ -75,7 +75,7 @@ type RaftCluster struct {
 
 // ClusterStatus saves some state information
 type ClusterStatus struct {
-	RaftBootstrapTime time.Time `json:"raft_bootstrap_time,omitempty"`
+	RaftBootstrapTime time.Time `json:"raft_bootstrap_time"`
 	IsInitialized     bool      `json:"is_initialized"`
 }
 

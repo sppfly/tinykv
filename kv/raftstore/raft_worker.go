@@ -42,7 +42,7 @@ func (rw *raftWorker) run(closeCh <-chan struct{}, wg *sync.WaitGroup) {
 			msgs = append(msgs, msg)
 		}
 		pending := len(rw.raftCh)
-		for i := 0; i < pending; i++ {
+		for range pending {
 			msgs = append(msgs, <-rw.raftCh)
 		}
 		peerStateMap := make(map[uint64]*peerState)
