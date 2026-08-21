@@ -15,7 +15,6 @@ package operator
 
 import (
 	"encoding/json"
-	"sync/atomic"
 	"testing"
 	"time"
 
@@ -144,7 +143,7 @@ func (s *testOperatorSuite) TestOperator(c *C) {
 	op = s.newTestOperator(1, OpLeader|OpRegion, steps...)
 	s.checkSteps(c, op, steps)
 	c.Assert(op.Check(region), Equals, RemovePeer{FromStore: 2})
-	c.Assert(atomic.LoadInt32(&op.currentStep), Equals, int32(2))
+	c.Assert(op.currentStep.Load(), Equals, int32(2))
 	op.startTime = time.Now()
 	c.Assert(op.IsTimeout(), IsFalse)
 	op.startTime = op.startTime.Add(-LeaderOperatorWaitTime - time.Second)

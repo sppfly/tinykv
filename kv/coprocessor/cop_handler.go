@@ -119,11 +119,9 @@ func (svr *CopHandler) getTopNInfo(ctx *evalContext, topN *tipb.TopN) (heap *top
 		pbConds[i] = item.Expr
 	}
 	heap = &topNHeap{
-		totalCount: int(topN.Limit),
-		topNSorter: topNSorter{
-			orderByItems: topN.OrderBy,
-			sc:           ctx.sc,
-		},
+		totalCount:   int(topN.Limit),
+		orderByItems: topN.OrderBy,
+		sc:           ctx.sc,
 	}
 	if conds, err = convertToExprs(ctx.sc, ctx.fieldTps, pbConds); err != nil {
 		return nil, nil, errors.Trace(err)

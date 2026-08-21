@@ -90,7 +90,7 @@ var EnableZap = false
 // Server is the pd server.
 type Server struct {
 	// Server state.
-	isServing int64
+	isServing atomic.Int64
 
 	// Configs and initial fields.
 	cfg         *config.Config
@@ -241,7 +241,7 @@ func (s *Server) startServer(ctx context.Context) error {
 	s.cluster = newRaftCluster(ctx, s, s.clusterID)
 	s.hbStreams = newHeartbeatStreams(ctx, s.clusterID, s.cluster)
 	// Server has started.
-	atomic.StoreInt64(&s.isServing, 1)
+	s.isServing.Store(1)
 	return nil
 }
 
@@ -263,7 +263,7 @@ func (s *Server) initClusterID() error {
 
 // Close closes the server.
 func (s *Server) Close() {
-	if !atomic.CompareAndSwapInt64(&s.isServing, 1, 0) {
+	if !s.isServing.CompareAndSwap(1, 0) {
 		// server is already closed
 		return
 	}
@@ -292,7 +292,7 @@ func (s *Server) Close() {
 
 // IsClosed checks whether server is closed or not.
 func (s *Server) IsClosed() bool {
-	return atomic.LoadInt64(&s.isServing) == 0
+	return s.isServing.Load() == 0
 }
 
 // Run runs the pd server.

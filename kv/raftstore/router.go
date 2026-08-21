@@ -13,7 +13,7 @@ import (
 
 // peerState contains the peer states that needs to run raft command and apply command.
 type peerState struct {
-	closed uint32
+	closed atomic.Uint32
 	peer   *peer
 }
 
@@ -52,7 +52,7 @@ func (pr *router) close(regionID uint64) {
 	v, ok := pr.peers.Load(regionID)
 	if ok {
 		ps := v.(*peerState)
-		atomic.StoreUint32(&ps.closed, 1)
+		ps.closed.Store(1)
 		pr.peers.Delete(regionID)
 	}
 }
@@ -60,7 +60,7 @@ func (pr *router) close(regionID uint64) {
 func (pr *router) send(regionID uint64, msg message.Msg) error {
 	msg.RegionID = regionID
 	p := pr.get(regionID)
-	if p == nil || atomic.LoadUint32(&p.closed) == 1 {
+	if p == nil || p.closed.Load() == 1 {
 		return errPeerNotFound
 	}
 	pr.peerSender <- msg

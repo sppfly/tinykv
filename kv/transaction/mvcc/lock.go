@@ -26,11 +26,11 @@ type KlPair struct {
 
 // Info creates a LockInfo object from a Lock object for key.
 func (lock *Lock) Info(key []byte) *kvrpcpb.LockInfo {
-	info := kvrpcpb.LockInfo{}
-	info.Key = key
-	info.LockVersion = lock.Ts
-	info.PrimaryLock = lock.Primary
-	info.LockTtl = lock.Ttl
+	info := kvrpcpb.LockInfo{
+		Key:         key,
+		LockVersion: lock.Ts,
+		PrimaryLock: lock.Primary,
+		LockTtl:     lock.Ttl}
 	return &info
 }
 

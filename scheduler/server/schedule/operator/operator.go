@@ -122,7 +122,7 @@ type Operator struct {
 	regionEpoch *metapb.RegionEpoch
 	kind        OpKind
 	steps       []OpStep
-	currentStep int32
+	currentStep atomic.Int32
 	createTime  time.Time
 	// startTime is used to record the start time of an operator which is added into running operators.
 	startTime time.Time
@@ -154,7 +154,7 @@ func (o *Operator) String() string {
 	for i := range o.steps {
 		stepStrs[i] = o.steps[i].String()
 	}
-	s := fmt.Sprintf("%s {%s} (kind:%s, region:%v(%v,%v), createAt:%s, startAt:%s, currentStep:%v, steps:[%s])", o.desc, o.brief, o.kind, o.regionID, o.regionEpoch.GetVersion(), o.regionEpoch.GetConfVer(), o.createTime, o.startTime, atomic.LoadInt32(&o.currentStep), strings.Join(stepStrs, ", "))
+	s := fmt.Sprintf("%s {%s} (kind:%s, region:%v(%v,%v), createAt:%s, startAt:%s, currentStep:%v, steps:[%s])", o.desc, o.brief, o.kind, o.regionID, o.regionEpoch.GetVersion(), o.regionEpoch.GetConfVer(), o.createTime, o.startTime, o.currentStep.Load(), strings.Join(stepStrs, ", "))
 	if o.IsTimeout() {
 		s = s + " timeout"
 	}
@@ -235,9 +235,9 @@ func (o *Operator) Step(i int) OpStep {
 // Check checks if current step is finished, returns next step to take action.
 // It's safe to be called by multiple goroutine concurrently.
 func (o *Operator) Check(region *core.RegionInfo) OpStep {
-	for step := atomic.LoadInt32(&o.currentStep); int(step) < len(o.steps); step++ {
+	for step := o.currentStep.Load(); int(step) < len(o.steps); step++ {
 		if o.steps[int(step)].IsFinish(region) {
-			atomic.StoreInt32(&o.currentStep, step+1)
+			o.currentStep.Store(step + 1)
 			atomic.StoreInt64(&o.stepTime, time.Now().UnixNano())
 		} else {
 			return o.steps[int(step)]
@@ -249,7 +249,7 @@ func (o *Operator) Check(region *core.RegionInfo) OpStep {
 // ConfVerChanged returns the number of confver has consumed by steps
 func (o *Operator) ConfVerChanged(region *core.RegionInfo) int {
 	total := 0
-	current := atomic.LoadInt32(&o.currentStep)
+	current := o.currentStep.Load()
 	if current == int32(len(o.steps)) {
 		current--
 	}
@@ -274,7 +274,7 @@ func (o *Operator) GetPriorityLevel() core.PriorityLevel {
 
 // IsFinish checks if all steps are finished.
 func (o *Operator) IsFinish() bool {
-	return atomic.LoadInt32(&o.currentStep) >= int32(len(o.steps))
+	return o.currentStep.Load() >= int32(len(o.steps))
 }
 
 // IsTimeout checks the operator's create time and determines if it is timeout.
@@ -331,10 +331,10 @@ func CreateTransferLeaderOperator(desc string, region *core.RegionInfo, sourceSt
 
 // interleaveStepGroups interleaves two slice of step groups. For example:
 //
-//  a = [[opA1, opA2], [opA3], [opA4, opA5, opA6]]
-//  b = [[opB1], [opB2], [opB3, opB4], [opB5, opB6]]
-//  c = interleaveStepGroups(a, b, 0)
-//  c == [opA1, opA2, opB1, opA3, opB2, opA4, opA5, opA6, opB3, opB4, opB5, opB6]
+//	a = [[opA1, opA2], [opA3], [opA4, opA5, opA6]]
+//	b = [[opB1], [opB2], [opB3, opB4], [opB5, opB6]]
+//	c = interleaveStepGroups(a, b, 0)
+//	c == [opA1, opA2, opB1, opA3, opB2, opA4, opA5, opA6, opB3, opB4, opB5, opB6]
 //
 // sizeHint is a hint for the capacity of returned slice.
 func interleaveStepGroups(a, b [][]OpStep, sizeHint int) []OpStep {
